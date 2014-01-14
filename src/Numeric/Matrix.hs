@@ -577,7 +577,7 @@ _at :: (IArray a (u Int e), IArray u e)
 _at arr (i,j) = arr ! i ! j
 
 _row, _col :: (IArray a (u Int e), IArray u e) => Int -> a Int (u Int e) -> [e]
-_row i arr = let row = arr ! i in [ row ! j | j <- [1..(snd (bounds arr))] ]
+_row i arr = let row = arr ! i in [ row ! j | j <- [1..(snd (bounds row))] ]
 _col j arr = [ arr ! i ! j | i <- [1..(snd (bounds arr))] ]
 
 _toList :: (IArray a e) => Array Int (a Int e) -> [[e]]
