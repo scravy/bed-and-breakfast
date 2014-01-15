@@ -66,11 +66,11 @@ Build-Type:     Simple
 Cabal-Version:  >= 1.8
 Category:       Numeric, Math, Linear Algebra
 Stability:      experimental
-Homepage:       http://hub.darcs.net/scravy/bed-and-breakfast
+Homepage:       https://hackage.haskell.org/package/bed-and-breakfast
 
 Source-Repository head
-    type: darcs
-    location: hub.darcs.net:bed-and-breakfast
+    type: git
+    location: https://github.com/scravy/bed-and-breakfast.git
 
 Library
     Exposed-Modules:    Numeric.Matrix,
