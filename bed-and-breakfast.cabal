@@ -1,5 +1,5 @@
 Name:           bed-and-breakfast
-Version:        0.4.1
+Version:        0.4.2
 Synopsis:       Efficient Matrix operations in 100% Haskell.
 Description:    Efficient Matrix operations in 100% Haskell.
                 .
@@ -56,6 +56,10 @@ Description:    Efficient Matrix operations in 100% Haskell.
                 [@v0.4.1@] The unsafe operations used in v0.4 turned out
                     to fatally fail on certain platforms. Revoked this
                     change.
+                .
+                [@v0.4.2@] Fixed a tiny bug regarding the @row@ function
+                    for extracting the number of rows in a Matrix.
+                    Thanks to Tim Makarios for finding and fixing the bug.
 
 
 License:        MIT
