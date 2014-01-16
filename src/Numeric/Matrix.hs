@@ -453,7 +453,8 @@ class (Eq e, Num e) => MatrixElement e where
                                     (x:xs) -> (length xs + 1, length x)
 
     adjugate = transpose . cofactors
-    transpose m = matrix (dimensions m) (\(i,j) -> m `at` (j,i))
+    transpose mat = matrix (n, m) (\(i,j) -> mat `at` (j,i))
+      where (m, n) = dimensions mat
     trace = select (uncurry (==))
     inv _ = Nothing
 
