@@ -29,10 +29,9 @@
 --      work as expected.
 --
 -- [@Complex@] Experimental. Uses boxed arrays internally.
---      The current implementation of 'inv' requires an instance
---      of 'Ord' for the component type, therefor it is currently
---      not possible to calculate the inverse of a complex matrix
---      (on my to do list).
+--      All matrix operations will work as expected, though
+--      finding the inverse of a matrix isa tad less numerically
+--      stable than with a @Double@ matrix.
 module Numeric.Matrix (
 
     Matrix,
