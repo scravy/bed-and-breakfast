@@ -49,7 +49,12 @@ module Numeric.Matrix (
     isZero,
     isDiagonal,
     isEmpty,
-    isSquare
+    isSquare,
+
+    -- ** Conversions
+    toDoubleMatrix,
+    toComplexMatrix,
+    toRationalMatrix
     
 ) where
 
@@ -283,6 +288,16 @@ isDiagonal m = isSquare m && allWithIndex (uncurry check) m
 isSquare m = let (a, b) = dimensions m in a == b
 
 
+toDoubleMatrix :: (MatrixElement a, Integral a) => Matrix a -> Matrix Double
+toDoubleMatrix = map fromIntegral
+
+toRationalMatrix :: (MatrixElement a, Real a) => Matrix a -> Matrix Rational
+toRationalMatrix = map toRational
+
+toComplexMatrix :: (MatrixElement a, RealFloat a, Show a) => Matrix a -> Matrix (Complex a)
+toComplexMatrix = map (:+ 0)
+
+
 class Division e where
     divide :: e -> e -> e
 
@@ -344,6 +359,12 @@ class (Eq e, Num e) => MatrixElement e where
     --
     -- > fromList [[1,2,3],[2,1,3],[3,2,1]] :: Matrix Rational
     fromList :: [[e]] -> Matrix e
+
+    -- | Turns a matrix into a list of lists.
+    --
+    -- > (toList . fromList) xs == xs
+    --
+    -- > (fromList . toList) mat == mat
     toList   :: Matrix e -> [[e]]
 
     -- | An identity square matrix of the given size.
@@ -410,12 +431,31 @@ class (Eq e, Num e) => MatrixElement e where
 
     -- | Compute the rank of a matrix.
     rank      :: Matrix e -> e
+
+    -- | Select the diagonal elements of a matrix as a list.
+    --
+    -- > 1 8 3
+    -- > 3 6 5 --trace-> [1, 6, 2]
+    -- > 7 4 2
     trace     :: Matrix e -> [e]
 
-    minor :: MatrixElement e => Matrix e -> (Int, Int) -> e
+    -- | Select the minor of a matrix, that is the determinant
+    -- of the 'minorMatrix'.
+    --
+    -- > minor = det . minorMatrix
+    minor :: MatrixElement e => (Int, Int) -> Matrix e -> e
+
+    -- | Select the minor matrix of a matrix, a matrix that is obtained
+    -- by deleting the i-th row and j-th column.
+    --
+    -- > 10  9 95 45
+    -- >  8  7  3 27                        8  3 27
+    -- > 13 17 19 23 --minorMatrix (1,2)-> 13 19 23
+    -- >  1  2  5  8                        1  5  8
+    minorMatrix :: MatrixElement e => (Int, Int) -> Matrix e -> Matrix e
+
     cofactors :: MatrixElement e => Matrix e -> Matrix e
     adjugate :: MatrixElement e => Matrix e -> Matrix e
-    minorMatrix :: MatrixElement e => Matrix e -> (Int, Int) -> Matrix e
 
     -- | Apply a function on every component in the matrix.
     map :: MatrixElement f => (e -> f) -> Matrix e -> Matrix f
@@ -442,10 +482,10 @@ class (Eq e, Num e) => MatrixElement e where
                               , j <- [1..numCols m]
                               , p (i,j) ]
 
-    at m (i, j) = ((!! j) . (!! i) . toList) m
+    at mat (i, j) = ((!! j) . (!! i) . toList) mat
     
-    row i m = ((!! (i-1)) . toList) m
-    col i m = (row i . transpose) m
+    row i = (!! (i-1)) . toList
+    col i = row i . transpose
 
     numRows = fst . dimensions
     numCols = snd . dimensions
@@ -458,14 +498,14 @@ class (Eq e, Num e) => MatrixElement e where
     trace = select (uncurry (==))
     inv _ = Nothing
 
-    minorMatrix m (i,j) = matrix (numRows m - 1, numCols m - 1) $
-                \(i',j') -> m `at` (if i' >= i then i' + 1 else i',
-                                    if j' >= j then j' + 1 else j')
+    minorMatrix (i,j) mat = matrix (numRows mat - 1, numCols mat - 1) $
+                \(i',j') -> mat `at` (if i' >= i then i' + 1 else i',
+                                      if j' >= j then j' + 1 else j')
 
-    minor m = det . minorMatrix m
+    minor ix = det . minorMatrix ix
 
-    cofactors m = matrix (dimensions m) $
-       \(i,j) -> fromIntegral ((-1 :: Int)^(i+j)) * minor m (i,j)
+    cofactors mat = matrix (dimensions mat) $
+       \(i,j) -> fromIntegral ((-1 :: Int)^(i+j)) * minor (i,j) mat
 
     map f = mapWithIndex (const f)
     all f = allWithIndex (const f)
@@ -493,7 +533,7 @@ instance MatrixElement Int where
     fromList = _fromList IntMatrix
 
     at         (IntMatrix _ _ arr) = _at arr
-    dimensions (IntMatrix m n _) = (m, n)
+    dimensions (IntMatrix m n _)   = (m, n)
     row i      (IntMatrix _ _ arr) = _row i arr
     col j      (IntMatrix _ _ arr) = _col j arr
     toList     (IntMatrix _ _ arr) = _toList arr
@@ -505,7 +545,7 @@ instance MatrixElement Integer where
     fromList   = _fromList IntegerMatrix
 
     at         (IntegerMatrix _ _ arr) = _at arr
-    dimensions (IntegerMatrix m n _) = (m, n)
+    dimensions (IntegerMatrix m n _)   = (m, n)
     row i      (IntegerMatrix _ _ arr) = _row i arr
     col j      (IntegerMatrix _ _ arr) = _col j arr
     toList     (IntegerMatrix _ _ arr) = _toList arr
@@ -524,7 +564,7 @@ instance MatrixElement Float where
     det        (FloatMatrix m n arr) = if m /= n then 0 else runST (_det thawsUnboxed arr)
     rank       (FloatMatrix _ _ arr) = runST (_rank thawsBoxed arr)
     inv        (FloatMatrix m n arr) = if m /= n then Nothing else
-                                         let x = runST (_inv unboxedST arr)
+                                         let x = runST (_inv unboxedST pivotMax arr)
                                          in maybe Nothing (Just . FloatMatrix m n) x
 
 instance MatrixElement Double where
@@ -536,11 +576,11 @@ instance MatrixElement Double where
     row i      (DoubleMatrix _ _ arr) = _row i arr
     col j      (DoubleMatrix _ _ arr) = _col j arr
     toList     (DoubleMatrix _ _ arr) = _toList arr
-    inv        (DoubleMatrix m n arr) = if m /= n then Nothing else
-                                         let x = runST (_inv unboxedST arr)
-                                         in maybe Nothing (Just . DoubleMatrix m n) x
     det        (DoubleMatrix m n arr) = if m /= n then 0 else runST (_det thawsUnboxed arr)
     rank       (DoubleMatrix _ _ arr) = runST (_rank thawsBoxed arr)
+    inv        (DoubleMatrix m n arr) = if m /= n then Nothing else
+                                         let x = runST (_inv unboxedST pivotMax arr)
+                                         in maybe Nothing (Just . DoubleMatrix m n) x
 
 instance (Show a, Integral a) => MatrixElement (Ratio a) where
     matrix d g = runST (_matrix RatioMatrix arrayST arrayST d g)
@@ -551,11 +591,11 @@ instance (Show a, Integral a) => MatrixElement (Ratio a) where
     row i      (RatioMatrix _ _ arr) = _row i arr
     col j      (RatioMatrix _ _ arr) = _col j arr
     toList     (RatioMatrix _ _ arr) = _toList arr
-    inv        (RatioMatrix m n arr) = if m /= n then Nothing else
-                                        let x = runST (_inv boxedST arr)
-                                        in maybe Nothing (Just . RatioMatrix m n) x
     det        (RatioMatrix m n arr) = if m /= n then 0 else  runST (_det thawsBoxed arr)
     rank       (RatioMatrix _ _ arr) = runST (_rank thawsBoxed arr)
+    inv        (RatioMatrix m n arr) = if m /= n then Nothing else
+                                        let x = runST (_inv boxedST pivotMax arr)
+                                        in maybe Nothing (Just . RatioMatrix m n) x
 
 instance (Show a, RealFloat a) => MatrixElement (Complex a) where
     matrix d g = runST (_matrix ComplexMatrix arrayST arrayST d g)
@@ -566,11 +606,11 @@ instance (Show a, RealFloat a) => MatrixElement (Complex a) where
     row i      (ComplexMatrix _ _ arr) = _row i arr
     col j      (ComplexMatrix _ _ arr) = _col j arr
     toList     (ComplexMatrix _ _ arr) = _toList arr
---    inv        (ComplexMatrix _ _ _) = Nothing
---if m /= n then Nothing else
--- Just $ ComplexMatrix m n $ runST (_inv boxedST arr)
     det        (ComplexMatrix m n arr) = if m /= n then 0 else runST (_det thawsBoxed arr)
     rank       (ComplexMatrix _ _ arr) = runST (_rank thawsBoxed arr)
+    inv        (ComplexMatrix m n arr) = if m /= n then Nothing else
+                                          let x = runST (_inv boxedST pivotNonZero arr)
+                                          in maybe Nothing (Just . ComplexMatrix m n) x
 
 
 _at :: (IArray a (u Int e), IArray u e)
@@ -647,14 +687,23 @@ read :: (MArray a1 b m, MArray a (a1 Int b) m) =>
                        a Int (a1 Int b) -> Int -> Int -> m b
 read a i j = readArray a i >>= flip readArray j
 
+pivotMax :: Ord v => [(i, v)] -> i
+pivotMax = fst . L.maximumBy (compare `on` snd)
 
-_inv :: (IArray a e, MArray (u s) e (ST s), Fractional e, Ord e, Show e)
+pivotNonZero :: (Num v, Eq v) => [(i, v)] -> i
+pivotNonZero xs = maybe (fst $ head xs) fst $ L.find ((/= 0) . snd) xs
+
+_inv :: (IArray a e, MArray (u s) e (ST s), Fractional e, Show e, Eq e)
      => ((Int, Int) -> [e] -> ST s ((u s) Int e))
+        -- ^ A function for building a new array
+     -> ([(Int, e)] -> Int)
+        -- ^ A function for selecting pivot elements
      -> Array Int (a Int e)
+        -- ^ A matrix as arrays or arrays
      -> ST s (Maybe (Array Int (a Int e)))
-_inv mkArrayST mat = do
+_inv mkArrayST selectPivot mat = do
     let m = snd $ bounds mat
-        n = 2*m
+        n = 2 * m
 
         swap a i j = do
             tmp <- readArray a i
@@ -666,8 +715,8 @@ _inv mkArrayST mat = do
     a <- augment mkArrayST mat
 
     forM_ [1..m] $ \k -> do
-        iPivot <- zip [k..m] <$> mapM (\i -> abs <$> read a i k) [k..m]
-                    >>= return . fst . L.maximumBy (compare `on` snd)
+        iPivot <- selectPivot <$> zip [k..m]
+                              <$> mapM (\i -> abs <$> read a i k) [k..m]
 
         p <- read a iPivot k
         if p == 0 then writeSTRef okay False else do
@@ -713,7 +762,9 @@ _inv mkArrayST mat = do
 
 _rank :: (IArray a e, MArray (u s) e (ST s), Num e, Division e, Eq e)
       => (Array Int (a Int e) -> ST s [(u s) Int e])
+      -- ^ A function for thawing a boxed array
       -> Array Int (a Int e)
+      -- ^ A matrix given as array of arrays
       -> ST s e
 _rank thaws mat = do
     let m = snd $ bounds mat
@@ -810,6 +861,9 @@ _det thaws mat = do
     liftM2 (*) (readSTRef pivotR) (readSTRef signR)
 
 
+-- TODO: More efficient implementation (decrease the constant factors
+-- a little bit by working in the ST monad)
+-- [ remark: not sure if this will be faster than lists -> benchmark! ]
 _mult :: MatrixElement e => Matrix e -> Matrix e -> Matrix e
 _mult a b = let rowsA = numRows a
                 rowsB = numRows b
