@@ -100,9 +100,18 @@
 
   <dt>v0.4.3</dt>
   <dd>
-    Fixed a bug in @transpose@ that prevented it from
+    Fixed a bug in <code>transpose</code> that prevented it from
     working correctly with non-square matrices.
     Thanks to @owst@ from @hub.darcs.net@.
+  </dd>
+
+  <dt>v0.5</dt>
+  <dd>
+    <code>inv</code> works now for complex matrices too.
+    Added conversion functions <code>toDoubleMatrix</code>,
+    <code>toComplexMatrix</code>, <code>toRationalMatrix</code>.
+    Changed signature of <code>minor</code> and <code>minorMatrix</code>
+    to a more natural format.
   </dd>
 </dl>
 
