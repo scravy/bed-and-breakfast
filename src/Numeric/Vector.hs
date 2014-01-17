@@ -44,3 +44,10 @@ instance Typeable a => Typeable (Vector a) where
 
 
 
+-- <.>
+dotProd = undefined
+
+-- ><
+vectorProd = undefined
+
+

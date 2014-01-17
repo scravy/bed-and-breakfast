@@ -1,7 +1,7 @@
 Name:           bed-and-breakfast
 Version:        0.5
-Synopsis:       Efficient Matrix operations in 100% Haskell.
-Description:    Efficient Matrix operations in 100% Haskell.
+Synopsis:       Efficient Matrix and Vector operations in 100% Haskell.
+Description:    Efficient Matrix and Vector operations in 100% Haskell.
                 .
                 This library uses boxed and unboxed arrays
                 in the ST monad, in order to achieve efficiency.
