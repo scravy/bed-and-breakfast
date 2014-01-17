@@ -1,5 +1,5 @@
 Name:           bed-and-breakfast
-Version:        0.4.2
+Version:        0.4.3
 Synopsis:       Efficient Matrix operations in 100% Haskell.
 Description:    Efficient Matrix operations in 100% Haskell.
                 .
@@ -60,6 +60,10 @@ Description:    Efficient Matrix operations in 100% Haskell.
                 [@v0.4.2@] Fixed a tiny bug regarding the @row@ function
                     for extracting the number of rows in a Matrix.
                     Thanks to Tim Makarios for finding and fixing the bug.
+                .
+                [@v0.4.3@] Fixed a bug in @transpose@ that prevented it from
+                    working correctly with non-square matrices.
+                    Thanks to @owst@ from @hub.darcs.net@.
 
 
 License:        MIT
@@ -91,7 +95,7 @@ Test-Suite quickcheck
     main-is:        quickcheck-tests.hs
     GHC-Options:    -O2
     build-depends:  base >= 4.5 && < 5,
-                    bed-and-breakfast == 0.3.2,
+                    bed-and-breakfast,
                     QuickCheck >= 2.4.2
 
 
