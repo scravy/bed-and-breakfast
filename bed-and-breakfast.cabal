@@ -2,6 +2,9 @@ Name:           bed-and-breakfast
 Version:        0.4.3
 Synopsis:       Efficient Matrix operations in 100% Haskell.
 Description:    Efficient Matrix operations in 100% Haskell.
+                .
+                This library uses boxed and unboxed arrays
+                in the ST monad, in order to achieve efficiency.
 License:        MIT
 License-File:   LICENSE
 Author:         Julian Fleischer <julian.fleischer@fu-berlin.de>
@@ -11,6 +14,8 @@ Cabal-Version:  >= 1.8
 Category:       Numeric, Math, Linear Algebra
 Stability:      experimental
 Homepage:       https://hackage.haskell.org/package/bed-and-breakfast
+
+Extra-Source-Files: CHANGES.md, README.md, ROADMAP.md
 
 Source-Repository head
     type: git
