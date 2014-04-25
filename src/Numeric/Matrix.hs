@@ -2,6 +2,8 @@
     , TypeFamilies
     , FlexibleContexts
     , Trustworthy
+    , StandaloneDeriving
+    , DeriveDataTypeable
  #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing #-}
 
@@ -139,6 +141,8 @@ import qualified Prelude as P
 -- See @encode@ and @decode@.
 data family Matrix e
 
+deriving instance Typeable Matrix
+
 data instance Matrix Int
     = IntMatrix !Int !Int (Array Int (UArray Int Int))
 
@@ -156,15 +160,6 @@ data instance Matrix (Ratio a)
 
 data instance Matrix (Complex a)
     = ComplexMatrix !Int !Int (Array Int (Array Int (Complex a)))
-
-
-instance Typeable a => Typeable (Matrix a) where
-    typeOf x = mkTyConApp (mkTyCon3 "bed-and-breakfast"
-                                    "Numeric.Matrix"
-                                    "Matrix") [typeOf (unT x)]
-      where
-        unT :: Matrix a -> a
-        unT = undefined
 
 instance (MatrixElement e, Show e) => Show (Matrix e) where
     show = unlines . P.map showRow . toList
