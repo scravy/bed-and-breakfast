@@ -4,8 +4,10 @@
     , Trustworthy
     , StandaloneDeriving
     , DeriveDataTypeable
+    , CPP
  #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing #-}
+{-# OPTIONS -cpp  -pgmPcpphs  -optP--cpp #-}
 
 -- | Efficient matrix operations in 100% pure Haskell.
 --
@@ -141,7 +143,11 @@ import qualified Prelude as P
 -- See @encode@ and @decode@.
 data family Matrix e
 
+#if defined(__GLASGOW_HASKELL__) && (__GLASGOW_HASKELL__ >= 707)
 deriving instance Typeable Matrix
+#else
+deriving instance Typeable1 Matrix
+#endif
 
 data instance Matrix Int
     = IntMatrix !Int !Int (Array Int (UArray Int Int))

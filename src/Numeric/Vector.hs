@@ -4,8 +4,10 @@
     , Trustworthy
     , StandaloneDeriving
     , DeriveDataTypeable
+    , CPP
  #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing #-}
+{-# OPTIONS -cpp  -pgmPcpphs  -optP--cpp #-}
 
 module Numeric.Vector (
     
@@ -20,13 +22,18 @@ import Data.Int
 import Data.Array.IArray
 import Data.Array.Unboxed
 
-import qualified Data.Array.Unsafe as U
-
 import Data.Typeable
+
+import qualified Data.Array.Unsafe as U
 
 data family Vector e
 
+#if defined(__GLASGOW_HASKELL__) && (__GLASGOW_HASKELL__ >= 707)
 deriving instance Typeable Vector
+#else
+deriving instance Typeable1 Vector
+#endif
+
 
 data instance Vector Int
     = IntVector !Int (UArray Int Int)
