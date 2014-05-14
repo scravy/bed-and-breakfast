@@ -2,8 +2,12 @@
     , TypeFamilies
     , FlexibleContexts
     , Trustworthy
+    , StandaloneDeriving
+    , DeriveDataTypeable
+    , CPP
  #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing #-}
+{-# OPTIONS -cpp  -pgmPcpphs  -optP--cpp #-}
 
 -- | Efficient matrix operations in 100% pure Haskell.
 --
@@ -139,6 +143,12 @@ import qualified Prelude as P
 -- See @encode@ and @decode@.
 data family Matrix e
 
+#if defined(__GLASGOW_HASKELL__) && (__GLASGOW_HASKELL__ >= 707)
+deriving instance Typeable Matrix
+#else
+deriving instance Typeable1 Matrix
+#endif
+
 data instance Matrix Int
     = IntMatrix !Int !Int (Array Int (UArray Int Int))
 
@@ -156,15 +166,6 @@ data instance Matrix (Ratio a)
 
 data instance Matrix (Complex a)
     = ComplexMatrix !Int !Int (Array Int (Array Int (Complex a)))
-
-
-instance Typeable a => Typeable (Matrix a) where
-    typeOf x = mkTyConApp (mkTyCon3 "bed-and-breakfast"
-                                    "Numeric.Matrix"
-                                    "Matrix") [typeOf (unT x)]
-      where
-        unT :: Matrix a -> a
-        unT = undefined
 
 instance (MatrixElement e, Show e) => Show (Matrix e) where
     show = unlines . P.map showRow . toList
