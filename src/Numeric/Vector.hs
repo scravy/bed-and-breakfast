@@ -7,7 +7,6 @@
     , CPP
  #-}
 {-# OPTIONS -Wall -fno-warn-name-shadowing #-}
-{-# OPTIONS -cpp  -pgmPcpphs  -optP--cpp #-}
 
 module Numeric.Vector (
     

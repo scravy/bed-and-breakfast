@@ -1,6 +1,4 @@
 {-# LANGUAGE Haskell2010, TemplateHaskell, QuasiQuotes #-}
---{-# OPTIONS -Wall #-}
-
 
 import Data.Maybe
 import System.Random
