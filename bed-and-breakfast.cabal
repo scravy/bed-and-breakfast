@@ -29,8 +29,10 @@ Library
                         deepseq >= 1.3,
                         array >= 0.4,
                         binary >= 0.5,
-                        template-haskell >= 2.7
+                        template-haskell >= 2.7,
+                        cpphs >= 1.18
     Hs-Source-Dirs:     src
+    GHC-Options:        -Wall -cpp -pgmPcpphs -optP--cpp
 
 Test-Suite quickcheck
     type:           exitcode-stdio-1.0

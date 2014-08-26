@@ -4,10 +4,8 @@
     , Trustworthy
     , StandaloneDeriving
     , DeriveDataTypeable
-    , CPP
  #-}
-{-# OPTIONS -Wall -fno-warn-name-shadowing #-}
-{-# OPTIONS -cpp  -pgmPcpphs  -optP--cpp #-}
+{-# OPTIONS_GHC -Wall -fno-warn-name-shadowing #-}
 
 -- | Efficient matrix operations in 100% pure Haskell.
 --
