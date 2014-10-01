@@ -87,6 +87,7 @@ import Data.Typeable
 import Prelude hiding (any, all, read, map)
 import qualified Prelude as P
 
+import Data.Monoid
 
 -- | Matrices are represented by a type which fits best the component type.
 -- For example a @Matrix Double@ is represented by unboxed arrays,
@@ -466,9 +467,16 @@ class (Eq e, Num e) => MatrixElement e where
     -- and return True if one or more components satisfy it.
     any :: (e -> Bool) -> Matrix e -> Bool
 
+    -- | Compute the sum of the components of the matrix.
+    sum :: Matrix e -> e
+
+    -- | Map each component of the matrix to a monoid, and combine the results.
+    foldMap :: Monoid m => (e -> m) -> Matrix e -> m
+
     mapWithIndex :: MatrixElement f => ((Int, Int) -> e -> f) -> Matrix e -> Matrix f
     allWithIndex :: ((Int, Int) -> e -> Bool) -> Matrix e -> Bool
     anyWithIndex :: ((Int, Int) -> e -> Bool) -> Matrix e -> Bool
+    foldMapWithIndex :: Monoid m => ((Int, Int) -> e -> m) -> Matrix e -> m
 
     unit n  = fromList [[ if i == j then 1 else 0 | j <- [1..n]] | i <- [1..n] ]
     zero n  = matrix (n,n) (const 0)
@@ -508,12 +516,16 @@ class (Eq e, Num e) => MatrixElement e where
     map f = mapWithIndex (const f)
     all f = allWithIndex (const f)
     any f = anyWithIndex (const f)
+    sum = getSum . foldMap Sum
+    foldMap f = foldMapWithIndex (const f)
 
     mapWithIndex f m = matrix (dimensions m) (\x -> f x (m `at` x))
     allWithIndex f m = P.all id [ f (i, j) (m `at` (i,j))
                                 | i <- [1..numRows m], j <- [1..numCols m]]
     anyWithIndex f m = P.any id [ f (i, j) (m `at` (i,j))
                                 | i <- [1..numRows m], j <- [1..numCols m]]
+    foldMapWithIndex f m = mconcat [ f (i, j) (m `at` (i,j))
+                                   | i <- [1..numRows m], j <- [1..numCols m]]
 
     a `plus` b
         | dimensions a /= dimensions b = error "Matrix.plus: dimensions don't match."
