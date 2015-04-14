@@ -22,4 +22,4 @@ not implemented yet are enumerated here):
   * Vector product
   * Outer product
 
-
+* Make it compatible with GHC 7.4 - 7.10
