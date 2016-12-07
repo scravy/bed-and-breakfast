@@ -1,7 +1,7 @@
 bed-and-breakfast
 =================
 
-Matrix operations in 100% pure Haskell.
+Matrix operations in 100% pure awesome Haskell.
 
 Bed and Breakfast is a linear algebra library written in Haskell.
 It provides fast matrix operations like finding the determinant
