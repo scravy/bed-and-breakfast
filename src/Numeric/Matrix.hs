@@ -4,6 +4,7 @@
     , Trustworthy
     , StandaloneDeriving
     , DeriveDataTypeable
+    , ConstrainedClassMethods
  #-}
 {-# OPTIONS_GHC -Wall -fno-warn-name-shadowing #-}
 
@@ -84,7 +85,7 @@ import qualified Data.Array.Unsafe as U
 
 import Data.Typeable
 
-import Prelude hiding (any, all, read, map)
+import Prelude hiding (any, all, read, map, foldMap)
 import qualified Prelude as P
 
 import Data.Monoid
