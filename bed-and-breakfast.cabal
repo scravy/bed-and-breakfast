@@ -32,7 +32,8 @@ Library
                         template-haskell >= 2.7,
                         cpphs >= 1.18
     Hs-Source-Dirs:     src
-    GHC-Options:        -Wall -cpp -pgmPcpphs -optP--cpp
+    GHC-Options:        -Wall -pgmPcpphs -optP--cpp
+    Extensions:         CPP
 
 Test-Suite quickcheck
     type:           exitcode-stdio-1.0
