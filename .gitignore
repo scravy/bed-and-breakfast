@@ -3,3 +3,5 @@
 thumbs.db
 dist
 
+.cabal-sandbox/
+cabal.sandbox.config
