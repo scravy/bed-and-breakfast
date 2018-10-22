@@ -1,4 +1,4 @@
-bed-and-breakfast
+bed-and-breakfast [![Build Status](https://travis-ci.org/scravy/bed-and-breakfast.svg?branch=master)](https://travis-ci.org/scravy/bed-and-breakfast)
 =================
 
 Matrix operations in 100% pure awesome Haskell.
