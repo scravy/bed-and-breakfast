@@ -6,6 +6,7 @@ ghc:
 install:
   - ghc-pkg list --global
   - ghc-pkg list --user
+  - cabal install QuickCheck
   - cabal install --only-dependencies
   - ghc-pkg list --global
   - ghc-pkg list --user
