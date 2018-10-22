@@ -85,7 +85,15 @@ import qualified Data.Array.Unsafe as U
 
 import Data.Typeable
 
-import Prelude hiding (any, all, read, map, foldMap)
+import Prelude (Show, Read, Num, Fractional, Eq, Bool (..), Integer, Integral,
+                Float, Double, RealFloat, Ord, Real,
+                (*), (/), (+), (-), (^), (.), (>=), (==), (/=), ($), (>), (!!),
+                (&&), (||),
+                undefined, null, head, zip, abs, flip, length, compare, drop,
+                negate, not, filter, fromIntegral, fst, snd, foldl1, min, max,
+                error, fromInteger, signum, lines, words, show, unwords,
+                unlines,
+                otherwise, id, const, uncurry, quot, toRational, fromRational)
 import qualified Prelude as P
 
 import Data.Monoid
@@ -105,7 +113,7 @@ import Data.Monoid
 --
 -- [@Show (Matrix e)@]
 -- Note that a Show instance for the component type @e@ must exist.
--- 
+--
 -- [@Read (Matrix e)@]
 -- You can read a matrix like so:
 --
